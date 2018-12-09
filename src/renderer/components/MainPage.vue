@@ -1,24 +1,26 @@
 <template>
   <div class="container">
-    <div class="columns is-multiline">
-      <div class="column">
-        <section class="section">
-          <ul
-            v-for="(clipItem, index) in allClip"
-            v-bind:key="'clip'+index"
-          >
-            <li>
-              <span v-html="clipItem.html"></span>
-              <button
-                type="button"
-                v-clipboard:copy=clipItem.text
-                v-clipboard:success="onCopy"
-              >Copy!</button>
-            </li>
-          </ul>
-        </section>
+    <div
+      class="row mt-4 clip-item"
+      v-for="(clipItem, index) in allClip"
+      v-bind:key="'clip'+index"
+      v-clipboard:copy=clipItem.text
+      v-clipboard:success="onCopy"
+    >
+      <div class="col-md-11">
+        <span
+          class="item-span"
+          v-html="clipItem.html"
+        >
+          <v-icon name="beer" />
+        </span>
+      </div>
+
+      <div class="col-md-1">
+        <button class="btn btn-info btn-block shadow">copy</button>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -27,6 +29,16 @@
 // import fs from 'fs';
 // import os from 'os';
 const { clipboard } = require("electron"); // eslint-disable-line
+
+function copiedInArray(needle, haystack) {
+  const count = haystack.length;
+  for (let i = 0; i < count; i += 1) {
+    if (haystack[i].text === needle) {
+      return true;
+    }
+  }
+  return false;
+}
 
 export default {
   name: 'main-page',
@@ -50,15 +62,17 @@ export default {
       if (isUndefined !== 'undefined') {
         const lastClip = this.allClip[0].html;
         if (this.currentClipHTML !== lastClip) {
-          this.allClip.unshift({
-            html: this.currentClipHTML,
-            text: this.currentClipText,
-          });
+          if (copiedInArray(clipboard.readText(), this.allClip) === false) {
+            this.allClip.unshift({
+              html: this.currentClipHTML,
+              text: this.currentClipText,
+            });
+          }
           if (this.allClip[this.allClip.length - 1].text === 'init text') {
             this.allClip.pop();
           }
         }
-      } else {
+      } else if (copiedInArray(clipboard.readText(), this.allClip) === false) {
         this.allClip.unshift({
           html: this.currentClipHTML,
           text: this.currentClipText,
@@ -68,7 +82,11 @@ export default {
   },
   methods: {
     onCopy() {
-      alert('item copied');
+      this.$toasted.show('Copied Successfully!', {
+        theme: 'outline',
+        position: 'bottom-right',
+        duration: 2500,
+      });
     },
   },
   computed: {},
@@ -76,17 +94,16 @@ export default {
 </script>
 
 <style>
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+/* Theming */
 body {
-  font-family: "Source Sans Pro", sans-serif;
+  transition: 0.4s;
 }
 
-img {
-  padding: 10px;
+.clip-item:hover {
+  cursor: pointer;
 }
 
-.image:hover {
-  transition: all 0.3s;
-  box-shadow: 0 0.3125rem 1rem 0 rgba(0, 0, 0, 0.4);
+.item-span div {
+  padding: 7px 10px;
 }
 </style>
