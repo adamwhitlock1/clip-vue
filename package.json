@@ -55,6 +55,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "buefy": "^0.7.1",
+    "electron-clipboard-watcher": "^1.0.1",
     "vue": "^2.5.16",
     "vue-awesome": "^3.2.0",
     "vue-clipboard2": "^0.2.1",
