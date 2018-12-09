@@ -9,6 +9,11 @@
           >
             <li>
               <span v-html="clipItem.html"></span>
+              <button
+                type="button"
+                v-clipboard:copy=clipItem.text
+                v-clipboard:success="onCopy"
+              >Copy!</button>
             </li>
           </ul>
         </section>
@@ -29,10 +34,7 @@ export default {
   data() {
     return {
       allClip: [
-        {
-          html: '<span>Welcome to Clip Vue!</span>',
-          text: 'Welcome to Clip Vue!',
-        },
+        { html: '<span>Welcome to Vue Copy</span>', text: 'init text' },
       ],
       clipboardAvailFormats: clipboard.availableFormats(),
       currentClipHTML: '',
@@ -43,18 +45,32 @@ export default {
     setInterval(() => {
       this.currentClipHTML = clipboard.readHTML();
       this.currentClipText = clipboard.readText();
-      const lastClip = this.allClip[0].html;
-      if (this.currentClipHTML !== lastClip) {
+
+      const isUndefined = typeof this.allClip[0].html;
+      if (isUndefined !== 'undefined') {
+        const lastClip = this.allClip[0].html;
+        if (this.currentClipHTML !== lastClip) {
+          this.allClip.unshift({
+            html: this.currentClipHTML,
+            text: this.currentClipText,
+          });
+          if (this.allClip[this.allClip.length - 1].text === 'init text') {
+            this.allClip.pop();
+          }
+        }
+      } else {
         this.allClip.unshift({
           html: this.currentClipHTML,
           text: this.currentClipText,
         });
-        console.log('PUSHING TO ARRAY');
-        // console.log(allClip);
       }
-    }, 3000);
+    }, 1000);
   },
-  methods: {},
+  methods: {
+    onCopy() {
+      alert('item copied');
+    },
+  },
   computed: {},
 };
 </script>

@@ -56,6 +56,7 @@
     "axios": "^0.18.0",
     "buefy": "^0.7.1",
     "vue": "^2.5.16",
+    "vue-clipboard2": "^0.2.1",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
