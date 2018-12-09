@@ -55,14 +55,11 @@
   "dependencies": {
     "axios": "^0.18.0",
     "buefy": "^0.7.1",
-    "electron-menubar": "^1.0.1",
-    "systeminformation": "^3.51.3",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1",
-    "vuex-electron": "^1.0.0",
-    "wallpaper": "^4.1.0"
+    "vuex-electron": "^1.0.0"
   },
   "devDependencies": {
     "ajv": "^6.5.0",
