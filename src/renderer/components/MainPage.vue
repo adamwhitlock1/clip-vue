@@ -1,16 +1,16 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <transition-group
       name="clip-list"
       tag="p"
     >
       <div
-        class="row mt-2 shadow clip-item align-self-center bg-white rounded"
+        class="row m-1 shadow clip-item align-self-center bg-white rounded"
         v-for="(clipItem, index) in allClip"
         v-bind:key="'clip'+index"
       >
         <div
-          class="col-md-10 align-self-center p-3"
+          class="col-sm-10 align-self-center p-3"
           v-clipboard:copy=clipItem.text
           v-clipboard:success="onCopy"
         >
@@ -23,7 +23,7 @@
         </div>
 
         <div
-          class="col-md-1 align-self-center"
+          class="col-sm-1 align-self-center p-3"
           v-clipboard:copy=clipItem.text
           v-clipboard:success="onCopy"
         >
@@ -34,7 +34,7 @@
             <v-icon name="copy" /></button>
         </div>
 
-        <div class="col-md-1 align-self-center">
+        <div class="col-sm-1 align-self-center p-3">
           <button
             class="btn btn-danger p-3 shadow"
             title="delete item from list"
