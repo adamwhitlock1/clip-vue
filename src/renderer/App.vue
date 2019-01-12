@@ -3,7 +3,7 @@
     id="app"
     class="bg-blue-darker  mx-auto"
   >
-    <div class="flex">
+    <div class="flex opacity-75">
 
       <div class="my-2 pl-2 flex justify-center content-center">
         <router-link
