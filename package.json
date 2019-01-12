@@ -55,7 +55,6 @@
   "dependencies": {
     "autoprefixer": "^9.4.4",
     "axios": "^0.18.0",
-    "buefy": "^0.7.1",
     "nedb": "^1.8.0",
     "vue": "^2.5.16",
     "vue-awesome": "^3.2.0",

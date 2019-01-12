@@ -1,27 +1,38 @@
 <template>
 
-  <div class="container bg-teal mx-auto p-2">
+  <div class="container bg-blue-darker mx-auto p-2">
+
+    <div class="my-2 pl-2 flex justify-center content-center">
+      <button
+        class="btn-white-outline"
+        @click="clearDb"
+      >
+
+        Clear Clipboard
+      </button>
+    </div>
 
     <transition-group
       name="clip-list"
       tag="p"
     >
       <div
-        class="my-2 pl-2 flex bg-white justify-center content-center"
+        class="my-2 p-4 flex bg-white shadow-lg rounded-lg clip-wrapper content-start"
         v-for="(clipItem, index) in allClip"
         v-bind:key="'clip'+index"
       >
-        <div class="flex w-3/4 align-self-center pt-2 mr-2">
+        <div class="flex w-3/4 items-start pt-2 mr-2 content-start">
+
           <div
-            class="item-span align-self-center w-full"
+            class="item-span items-start w-full small pr-2 "
             v-html="clipItem.html"
-            :class="{small: isSmall}"
+            :id="clipItem._id"
           >
 
           </div>
         </div>
 
-        <div class="flex w-1/4 align-self-center justify-center content-center">
+        <div class="flex w-1/4 mt-4 content-start items-start">
 
           <button
             v-clipboard:copy=clipItem.text
@@ -41,7 +52,7 @@
           <button
             class="btn-blue-outline"
             title="delete item from list"
-            @click="deleteItem(clipItem._id, index)"
+            @click="expandSection(clipItem._id)"
           >
             <v-icon name="expand" /></button>
 
@@ -128,6 +139,21 @@ export default {
     }, 1000);
   },
   methods: {
+    clearDb() {
+      db.remove({}, { multi: true }, (err, numRemoved) => {
+        console.log(numRemoved);
+      });
+    },
+
+    expandSection(id) {
+      const element = document.getElementById(id);
+      if (element.classList.contains('small')) {
+        element.classList.remove('small');
+      } else {
+        element.classList.add('small');
+      }
+    },
+
     onCopy() {
       this.$toasted.show('Copied Successfully!', {
         theme: 'outline',
@@ -197,7 +223,32 @@ body {
 }
 
 .small {
-  height: 60px;
+  height: 55px;
   overflow: scroll;
+  transition: 0.5s;
+  overflow-x: hidden;
+}
+
+.clip-wrapper:hover .small {
+  height: 150px;
+}
+
+*::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+*::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(124, 47, 47, 0.2);
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  @apply bg-blue;
+  outline: 1px solid white;
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-corner {
+  background-color: rgba(0, 0, 0, 0);
 }
 </style>

@@ -11,8 +11,14 @@ export default new Router({
       component: require('@/components/MainPage').default,
     },
     {
-      path: '*',
-      redirect: '/',
+      path: '/options',
+      name: 'options',
+      component: require('@/components/Options').default,
+    },
+    {
+      path: '/saved-clips',
+      name: 'saved-clips',
+      component: require('@/components/SavedClips').default,
     },
   ],
 });
