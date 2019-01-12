@@ -1,46 +1,50 @@
 <template>
-  <div class="container-fluid">
+
+  <div class="container bg-teal mx-auto p-2">
+
     <transition-group
       name="clip-list"
       tag="p"
     >
       <div
-        class="row m-1 shadow clip-item align-self-center bg-white rounded"
+        class="my-2 pl-2 flex bg-white justify-center content-center"
         v-for="(clipItem, index) in allClip"
         v-bind:key="'clip'+index"
       >
-        <div
-          class="col-sm-10 align-self-center p-3"
-          v-clipboard:copy=clipItem.text
-          v-clipboard:success="onCopy"
-        >
+        <div class="flex w-3/4 align-self-center pt-2 mr-2">
           <div
-            class="item-span align-self-center"
+            class="item-span align-self-center w-full"
             v-html="clipItem.html"
+            :class="{small: isSmall}"
           >
 
           </div>
         </div>
 
-        <div
-          class="col-sm-1 align-self-center p-3"
-          v-clipboard:copy=clipItem.text
-          v-clipboard:success="onCopy"
-        >
-          <button
-            class="btn btn-primary p-3 shadow"
-            title="copy item"
-          >
-            <v-icon name="copy" /></button>
-        </div>
+        <div class="flex w-1/4 align-self-center justify-center content-center">
 
-        <div class="col-sm-1 align-self-center p-3">
           <button
-            class="btn btn-danger p-3 shadow"
+            v-clipboard:copy=clipItem.text
+            v-clipboard:success="onCopy"
+            class="btn-blue-outline"
+          >
+            <v-icon name="copy" />
+          </button>
+
+          <button
+            class="btn-blue-outline"
             title="delete item from list"
-            @click="deleteItem(index)"
+            @click="deleteItem(clipItem._id, index)"
           >
             <v-icon name="ban" /></button>
+
+          <button
+            class="btn-blue-outline"
+            title="delete item from list"
+            @click="deleteItem(clipItem._id, index)"
+          >
+            <v-icon name="expand" /></button>
+
         </div>
       </div>
     </transition-group>
@@ -48,21 +52,29 @@
 </template>
 
 <script>
-// import path from 'path';
-// import fs from 'fs';
-// import os from 'os';
+const Datastore = require('nedb');
+const db = new Datastore({
+  filename: 'static/database.db',
+  timestampData: true,
+  autoload: true,
+});
+
+db.find({}, (err, docs) => {
+  if (err) console.log(err);
+  console.log(docs.length);
+});
 
 const { clipboard } = require("electron"); // eslint-disable-line
 
-function copiedInArray(needle, haystack) {
-  const count = haystack.length;
-  for (let i = 0; i < count; i += 1) {
-    if (haystack[i].text === needle) {
-      return true;
-    }
-  }
-  return false;
-}
+// function copiedInArray(needle, haystack) {
+//   const count = haystack.length;
+//   for (let i = 0; i < count; i += 1) {
+//     if (haystack[i].text === needle) {
+//       return true;
+//     }
+//   }
+//   return false;
+// }
 
 export default {
   name: 'main-page',
@@ -79,28 +91,40 @@ export default {
       clipboardAvailFormats: clipboard.availableFormats(),
       currentClipHTML: '',
       currentClipText: '',
+      isSmall: 'true',
     };
   },
   created() {
-    setInterval(() => {
-      this.currentClipHTML = clipboard.readHTML();
-      this.currentClipText = clipboard.readText();
-
-      const lastClip = this.allClip[0].html;
-      if (this.currentClipHTML !== lastClip && this.currentClipHTML !== '') {
-        if (copiedInArray(clipboard.readText(), this.allClip) === false) {
-          this.allClip.unshift({
-            html: this.currentClipHTML,
-            text: this.currentClipText,
-          });
-        }
-        if (
-          this.allClip[this.allClip.length - 1].text === 'init text' ||
-          this.allClip[this.allClip.length - 1].text === 'All items cleared'
-        ) {
-          this.allClip.pop();
-        }
+    db.find({}, (err, docs) => {
+      if (err) console.log(err);
+      if (docs.length > 0) {
+        this.allClip = docs;
       }
+    });
+
+    setInterval(() => {
+      const currentClipText = clipboard.readText();
+      const currentClipHTML = clipboard.readHTML();
+
+      if (currentClipText !== '') {
+        db.find({ text: currentClipText }, (err, docs) => {
+          if (docs.length === 0) {
+            console.log('no match');
+
+            db.insert({ text: currentClipText, html: currentClipHTML });
+
+            db.find({})
+              .sort({ createdAt: -1 })
+              .exec((err, docs) => {
+                this.allClip = docs;
+                console.log(`INSERTED new length: ${docs.length}`);
+                console.log(currentClipText);
+              });
+          }
+        });
+      }
+
+      // console.log(currentClipHTML);
     }, 1000);
   },
   methods: {
@@ -110,10 +134,18 @@ export default {
         position: 'bottom-right',
         duration: 2500,
       });
+      db.find({})
+        .sort({ createdAt: -1 })
+        .exec((err, docs) => {
+          this.allClip = docs;
+        });
     },
-    deleteItem(item) {
+    deleteItem(id, item) {
       clipboard.clear();
       if (item === 0 && this.allClip.length === 1) {
+        db.remove({ _id: id }, {}, (err, numRemoved) => {
+          console.log(numRemoved);
+        });
         this.allClip.unshift({
           html: '<span>All items cleared</span>',
           text: 'All items cleared',
@@ -125,7 +157,15 @@ export default {
           duration: 2500,
         });
       } else {
-        this.allClip.splice(item, 1);
+        db.remove({ _id: id }, {}, (err, numRemoved) => {
+          console.log(id);
+          console.log(numRemoved);
+          db.find({})
+            .sort({ createdAt: -1 })
+            .exec((err, docs) => {
+              this.allClip = docs;
+            });
+        });
         this.$toasted.show('Item Deleted', {
           theme: 'outline',
           position: 'bottom-right',
@@ -153,6 +193,11 @@ body {
 }
 
 .clip-list-move {
-  transition: transform 1s;
+  transition: opacity 1s;
+}
+
+.small {
+  height: 60px;
+  overflow: scroll;
 }
 </style>

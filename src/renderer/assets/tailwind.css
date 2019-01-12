@@ -1,0 +1,31 @@
+@tailwind preflight;
+@tailwind components;
+@tailwind utilities;
+
+.btn-blue-outline {
+  @apply shadow flex-1 self-center bg-transparent text-blue-dark font-semibold py-2 px-4 border border-blue rounded-full mr-2;
+  transition: 0.3s;
+}
+
+.btn-blue-outline:hover {
+  @apply shadow-lg border-transparent bg-blue text-white;
+  animation-name: bob;
+  animation-duration: 0.75s;
+}
+
+@keyframes bob {
+  0% {
+    transform: translateY(0px);
+  }
+  33% {
+    transform: translateY(1px);
+  }
+
+  66% {
+    transform: translateY(-1px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
