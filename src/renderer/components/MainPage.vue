@@ -24,7 +24,7 @@
         <div class="flex w-3/4 items-start pt-2 mr-2 content-start">
 
           <div
-            class="item-span items-start w-full small pr-2 "
+            class="item-span items-start w-full small pr-2 font-fira"
             v-html="clipItem.html"
             :id="clipItem._id"
           >

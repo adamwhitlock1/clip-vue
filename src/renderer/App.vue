@@ -5,12 +5,12 @@
   >
     <div class="flex opacity-75">
 
-      <div class="my-2 pl-2 flex justify-center content-center">
+      <div class="my-2 pl-2 flex justify-center content-center font-fira">
         <router-link
           to="/"
           class="btn-white-outline"
         >
-          ClipStream
+          ClipStream =>
         </router-link>
       </div>
       <div class="my-2 pl-2 flex justify-center content-center">
@@ -38,7 +38,13 @@
         </router-link>
       </div>
     </div>
-    <router-view></router-view>
+    <transition
+      name="fade"
+      mode="out-in"
+    >
+      <router-view></router-view>
+    </transition>
+
   </div>
 </template>
 
@@ -50,4 +56,15 @@ export default {
 
 <style>
 /* CSS */
+.fade-enter-active,
+.fade-leave-active {
+  transition-duration: 0.3s;
+  transition-property: opacity;
+  transition-timing-function: ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
 </style>

@@ -1,11 +1,16 @@
+const state = {
+  backgroundColor: 'black',
+  fontFamily: '',
+  shareImageStyle: '',
+};
+
+const getters = {};
+const mutations = {};
+const actions = {};
+
 export default {
-  state: {
-    backgroundColor: '',
-    fontFamily: '',
-    shareImageStyle: '',
-  },
-
-  getters: {},
-
-  mutations: {},
+  state,
+  getters,
+  mutations,
+  actions,
 };
