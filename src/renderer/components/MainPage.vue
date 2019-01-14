@@ -1,13 +1,12 @@
 <template>
 
-  <div class="container bg-blue-darker mx-auto p-2">
+  <div class="container bg-blue-darker mx-auto p-2 mb-16">
 
     <div class="my-2 pl-2 flex justify-center content-center">
       <button
         class="btn-white-outline"
         @click="clearDb"
       >
-
         Clear Clipboard
       </button>
     </div>
@@ -18,13 +17,15 @@
     >
       <div
         class="my-2 p-4 flex bg-white shadow-lg rounded-lg clip-wrapper content-start"
+        :style="{'background-color': color.hex}"
         v-for="(clipItem, index) in allClip"
         v-bind:key="'clip'+index"
       >
         <div class="flex w-3/4 items-start pt-2 mr-2 content-start">
 
           <div
-            class="item-span items-start w-full small pr-2 font-fira"
+            class="item-span shadow items-start w-full small p-4 font-fira"
+            :style="{color: textColor}"
             v-html="clipItem.html"
             :id="clipItem._id"
           >
@@ -32,29 +33,56 @@
           </div>
         </div>
 
-        <div class="flex w-1/4 mt-4 content-start items-start">
+        <div class="w-1/4 mt-4 content-start items-start">
 
-          <button
-            v-clipboard:copy=clipItem.text
-            v-clipboard:success="onCopy"
-            class="btn-blue-outline"
-          >
-            <v-icon name="copy" />
-          </button>
+          <div class="w-full flex mb-2">
 
-          <button
-            class="btn-blue-outline"
-            title="delete item from list"
-            @click="deleteItem(clipItem._id, index)"
-          >
-            <v-icon name="ban" /></button>
+            <button
+              v-clipboard:copy=clipItem.text
+              v-clipboard:success="onCopy"
+              class="btn-blue-outline"
+            >
+              <v-icon name="copy" />
+            </button>
 
-          <button
-            class="btn-blue-outline"
-            title="delete item from list"
-            @click="expandSection(clipItem._id)"
+            <button
+              class="btn-blue-outline"
+              title="delete item from list"
+              @click="deleteItem(clipItem._id, index)"
+            >
+              <v-icon name="ban" /></button>
+
+            <button
+              class="btn-blue-outline"
+              title="delete item from list"
+              @click="expandSection(clipItem._id)"
+            >
+              <v-icon name="expand" /></button>
+
+            <button
+              @click="saveClip(clipItem)"
+              class="btn-blue-outline"
+            >
+              <v-icon name="save" />
+            </button>
+
+          </div>
+
+          <div
+            v-if="isSmall === false"
+            class="w-full"
           >
-            <v-icon name="expand" /></button>
+
+            <div class="text-grey-dark">
+              <p>Color: {{ color.hex }}</p>
+
+            </div>
+
+            <sketch-picker
+              v-model="color"
+              v-if="clipSizes[clipItem._id] === false"
+            />
+          </div>
 
         </div>
       </div>
@@ -63,68 +91,49 @@
 </template>
 
 <script>
-const Datastore = require('nedb');
-const db = new Datastore({
-  filename: 'static/database.db',
-  timestampData: true,
-  autoload: true,
-});
-
-db.find({}, (err, docs) => {
-  if (err) console.log(err);
-  console.log(docs.length);
-});
-
+import { Sketch } from 'vue-color';
 const { clipboard } = require("electron"); // eslint-disable-line
-
-// function copiedInArray(needle, haystack) {
-//   const count = haystack.length;
-//   for (let i = 0; i < count; i += 1) {
-//     if (haystack[i].text === needle) {
-//       return true;
-//     }
-//   }
-//   return false;
-// }
 
 export default {
   name: 'main-page',
-  components: {},
+  components: { 'sketch-picker': Sketch },
   data() {
     return {
-      allClip: [
-        {
-          html: '<span>Welcome to Clip Vue</span>',
-          text: 'init text',
-          starred: false,
-        },
-      ],
+      color: 'inherit',
+      textColor: 'inherit',
+      allClip: [],
+      allSavedClip: [],
       clipboardAvailFormats: clipboard.availableFormats(),
       currentClipHTML: '',
       currentClipText: '',
-      isSmall: 'true',
+      isSmall: true,
+      clipSizes: {},
     };
   },
   created() {
-    db.find({}, (err, docs) => {
-      if (err) console.log(err);
-      if (docs.length > 0) {
+    this.$dbStream
+      .find({})
+      .sort({ createdAt: -1 })
+      .exec((err, docs) => {
         this.allClip = docs;
-      }
-    });
+      });
 
     setInterval(() => {
       const currentClipText = clipboard.readText();
       const currentClipHTML = clipboard.readHTML();
 
       if (currentClipText !== '') {
-        db.find({ text: currentClipText }, (err, docs) => {
+        this.$dbStream.find({ text: currentClipText }, (err, docs) => {
           if (docs.length === 0) {
             console.log('no match');
 
-            db.insert({ text: currentClipText, html: currentClipHTML });
+            this.$dbStream.insert({
+              text: currentClipText,
+              html: currentClipHTML,
+            });
 
-            db.find({})
+            this.$dbStream
+              .find({})
               .sort({ createdAt: -1 })
               .exec((err, docs) => {
                 this.allClip = docs;
@@ -134,24 +143,46 @@ export default {
           }
         });
       }
-
       // console.log(currentClipHTML);
     }, 1000);
   },
   methods: {
+    saveClip(clip) {
+      this.$dbSaved.find({ text: clip.text }, (err, docs) => {
+        if (docs.length === 0) {
+          console.log('no match');
+
+          this.$dbSaved.insert({
+            text: clip.text,
+            html: clip.html,
+            stream_id: clip._id,
+            stream_createAt: clip.createdAt,
+          });
+
+          this.$dbSaved
+            .find({})
+            .sort({ createdAt: -1 })
+            .exec((err, docs) => {
+              this.allSavedClip = docs;
+              console.log(`INSERTED new length: ${docs.length}`);
+              console.log(clip.text);
+            });
+        } else {
+          console.log('Entry allready in saved clips!');
+        }
+      });
+    },
+
     clearDb() {
-      db.remove({}, { multi: true }, (err, numRemoved) => {
+      this.$dbStream.remove({}, { multi: true }, (err, numRemoved) => {
         console.log(numRemoved);
       });
+      console.log('CLEAR_DB');
     },
 
     expandSection(id) {
       const element = document.getElementById(id);
-      if (element.classList.contains('small')) {
-        element.classList.remove('small');
-      } else {
-        element.classList.add('small');
-      }
+      console.log(element.id);
     },
 
     onCopy() {
@@ -160,22 +191,22 @@ export default {
         position: 'bottom-right',
         duration: 2500,
       });
-      db.find({})
-        .sort({ createdAt: -1 })
-        .exec((err, docs) => {
-          this.allClip = docs;
-        });
     },
     deleteItem(id, item) {
       clipboard.clear();
+      console.log('delete item');
+      console.log(id);
+      console.log(item);
+
       if (item === 0 && this.allClip.length === 1) {
-        db.remove({ _id: id }, {}, (err, numRemoved) => {
+        this.$dbStream.remove({ _id: id }, {}, (err, numRemoved) => {
           console.log(numRemoved);
         });
         this.allClip.unshift({
           html: '<span>All items cleared</span>',
           text: 'All items cleared',
         });
+
         this.allClip.splice(1, 1);
         this.$toasted.show('ALL Items Deleted', {
           theme: 'outline',
@@ -183,10 +214,11 @@ export default {
           duration: 2500,
         });
       } else {
-        db.remove({ _id: id }, {}, (err, numRemoved) => {
+        this.$dbStream.remove({ _id: id }, {}, (err, numRemoved) => {
           console.log(id);
           console.log(numRemoved);
-          db.find({})
+          this.$dbStream
+            .find({})
             .sort({ createdAt: -1 })
             .exec((err, docs) => {
               this.allClip = docs;
@@ -212,10 +244,6 @@ body {
 
 .clip-item:hover {
   cursor: pointer;
-}
-
-.item-span div {
-  padding: 7px 10px;
 }
 
 .clip-list-move {

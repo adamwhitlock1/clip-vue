@@ -3,14 +3,14 @@
     id="app"
     class="bg-blue-darker  mx-auto"
   >
-    <div class="flex opacity-75">
+    <div class="flex bg-blue-darker w-full fixed pin-b mx-auto">
 
-      <div class="my-2 pl-2 flex justify-center content-center font-fira">
+      <div class="my-2 pl-2 flex justify-center content-center">
         <router-link
           to="/"
           class="btn-white-outline"
         >
-          ClipStream =>
+          ClipStream
         </router-link>
       </div>
       <div class="my-2 pl-2 flex justify-center content-center">
@@ -42,7 +42,9 @@
       name="fade"
       mode="out-in"
     >
+
       <router-view></router-view>
+
     </transition>
 
   </div>
