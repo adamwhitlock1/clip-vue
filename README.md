@@ -1,6 +1,6 @@
-# wall-vue
+# clip-vue
 
-> Wallpaper app in vue
+> Clipboard manager
 
 #### Build Setup
 
