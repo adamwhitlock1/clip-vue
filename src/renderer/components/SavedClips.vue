@@ -48,6 +48,14 @@
             </button>
 
           </div>
+
+          <span><small>Saved: <time-ago
+                :refresh="10"
+                :datetime="clipItem.createdAt"
+                locale="en"
+                tooltip
+              ></time-ago></small></span>
+          <span><small> | {{ clipItem.charCount }} Characters</small></span>
         </div>
       </div>
     </transition-group>
@@ -55,10 +63,13 @@
 </template>
 
 <script>
+import 'vue2-timeago/dist/vue2-timeago.css';
+
+import TimeAgo from 'vue2-timeago';
 const { clipboard } = require("electron"); // eslint-disable-line
 export default {
   name: 'saved-clips',
-  components: {},
+  components: { TimeAgo },
   data() {
     return {
       savedClip: [],
@@ -143,45 +154,11 @@ body {
   transition: 0.4s;
 }
 
-.clip-item:hover {
-  cursor: pointer;
-}
-
 .item-span div {
   padding: 7px 10px;
 }
 
 .clip-list-move {
   transition: opacity 1s;
-}
-
-.small {
-  height: 55px;
-  overflow: scroll;
-  transition: 0.5s;
-  overflow-x: hidden;
-}
-
-.clip-wrapper:hover .small {
-  height: 150px;
-}
-
-*::-webkit-scrollbar {
-  width: 0.5em;
-}
-
-*::-webkit-scrollbar-track {
-  -webkit-box-shadow: inset 0 0 6px rgba(124, 47, 47, 0.2);
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb {
-  @apply bg-blue;
-  outline: 1px solid white;
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-corner {
-  background-color: rgba(0, 0, 0, 0);
 }
 </style>

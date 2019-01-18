@@ -45,4 +45,9 @@ new Vue({
   router,
   store,
   template: '<App/>',
+  data() {
+    return {
+      locale: 'en',
+    };
+  },
 }).$mount('#app');

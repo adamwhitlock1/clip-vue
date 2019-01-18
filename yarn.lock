@@ -4728,6 +4728,12 @@ iterm2-version@^3.0.0:
     app-path "^2.1.0"
     plist "^3.0.1"
 
+javascript-time-ago@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/javascript-time-ago/-/javascript-time-ago-2.0.0.tgz#29aa365290533b7855ebc5ddaf858f6d58dbf0de"
+  dependencies:
+    relative-time-format "^0.1.3"
+
 jpeg-js@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/jpeg-js/-/jpeg-js-0.2.0.tgz#53e448ec9d263e683266467e9442d2c5a2ef5482"
@@ -7082,6 +7088,10 @@ relateurl@0.2.x:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/relateurl/-/relateurl-0.2.7.tgz#54dbf377e51440aca90a4cd274600d3ff2d888a9"
 
+relative-time-format@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/relative-time-format/-/relative-time-format-0.1.3.tgz#d50f49d13f97c7f801afba600b1a4a0890755df2"
+
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/remove-trailing-separator/-/remove-trailing-separator-1.1.0.tgz#c24bce2a283adad5bc3f58e0d48249b92379d8ef"
@@ -8448,6 +8458,12 @@ vue-style-loader@^4.1.0:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
+vue-tag-selector@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/vue-tag-selector/-/vue-tag-selector-0.2.4.tgz#3a216b5d4f2296a1c98c87a4c4073e70d4d11289"
+  dependencies:
+    vue "^2.5.17"
+
 vue-template-compiler@^2.5.16:
   version "2.5.18"
   resolved "https://registry.yarnpkg.com/vue-template-compiler/-/vue-template-compiler-2.5.18.tgz#8a346e477c5ada6efc890a2db4857090a2c54a05"
@@ -8462,6 +8478,14 @@ vue-template-es2015-compiler@^1.6.0:
 vue-toasted@^1.1.26:
   version "1.1.26"
   resolved "https://registry.yarnpkg.com/vue-toasted/-/vue-toasted-1.1.26.tgz#1333d1a42157ab78389c3810023a49ba94e69c7b"
+
+vue2-timeago@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/vue2-timeago/-/vue2-timeago-1.1.3.tgz#be834aa78032ba3922cb8a75c9d5ba76b266e430"
+  dependencies:
+    babel-preset-env "^1.7.0"
+    node-sass "^4.9.2"
+    vue "^2.5.17"
 
 vue@^2.5.16, vue@^2.5.17:
   version "2.5.18"

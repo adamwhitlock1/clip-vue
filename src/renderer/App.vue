@@ -3,7 +3,7 @@
     id="app"
     class="bg-blue-darker  mx-auto"
   >
-    <div class="flex bg-blue-darker w-full fixed pin-b mx-auto">
+    <div class="flex bg-white w-full fixed pin-t shadow-md mx-auto pt-4 titlebar">
 
       <div class="my-2 pl-2 flex justify-center content-center">
         <router-link
@@ -43,7 +43,7 @@
       mode="out-in"
     >
 
-      <router-view></router-view>
+      <router-view class="mt-16"></router-view>
 
     </transition>
 
@@ -68,5 +68,16 @@ export default {
 .fade-enter,
 .fade-leave-active {
   opacity: 0;
+}
+
+.titlebar {
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+.clip-content div {
+  padding: 5px;
+  overflow-y: scroll;
+  border-radius: 5px;
 }
 </style>

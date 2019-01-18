@@ -2,7 +2,8 @@
 
   <div class="container bg-blue-darker mx-auto p-2 mb-16">
 
-    <div class="my-2 pl-2 flex justify-center content-center">
+    <div class="flex justify-center content-center w-full mt-6 mb-3">
+      <span class="mt-2 text-white flex justify-center content-center pl-2 pr-3">Clips: {{ allClip.length }}</span>
       <button
         class="btn-white-outline"
         @click="clearDb"
@@ -10,21 +11,20 @@
         Clear Clipboard
       </button>
     </div>
-
     <transition-group
       name="clip-list"
       tag="p"
     >
       <div
-        class="my-2 p-4 flex bg-white shadow-lg rounded-lg clip-wrapper content-start"
+        class="my-2 pt-1 pl-1 flex bg-white shadow-lg rounded-lg clip-wrapper content-start"
         :style="{'background-color': color.hex}"
         v-for="(clipItem, index) in allClip"
         v-bind:key="'clip'+index"
       >
-        <div class="flex w-3/4 items-start pt-2 mr-2 content-start">
+        <div class="flex w-3/4 items-start mr-2 content-start">
 
           <div
-            class="item-span shadow items-start w-full small p-4 font-fira"
+            class="item-span shadow items-start w-full small p-1 clip-content"
             :style="{color: textColor}"
             v-html="clipItem.html"
             :id="clipItem._id"
@@ -33,7 +33,7 @@
           </div>
         </div>
 
-        <div class="w-1/4 mt-4 content-start items-start">
+        <div class="w-1/4 mt-2 content-start items-start mx-auto">
 
           <div class="w-full flex mb-2">
 
@@ -42,7 +42,10 @@
               v-clipboard:success="onCopy"
               class="btn-blue-outline"
             >
-              <v-icon name="copy" />
+              <v-icon
+                name="copy"
+                scale=".8"
+              />
             </button>
 
             <button
@@ -50,53 +53,71 @@
               title="delete item from list"
               @click="deleteItem(clipItem._id, index)"
             >
-              <v-icon name="ban" /></button>
+              <v-icon
+                name="trash"
+                scale=".8"
+              /></button>
 
             <button
               class="btn-blue-outline"
               title="delete item from list"
               @click="expandSection(clipItem._id)"
             >
-              <v-icon name="expand" /></button>
-
+              <v-icon
+                name="expand"
+                scale=".8"
+              /></button>
             <button
-              @click="saveClip(clipItem)"
               class="btn-blue-outline"
+              title="delete item from list"
+              @click="showSavedClipModal(clipItem)"
             >
-              <v-icon name="save" />
-            </button>
-
+              <v-icon
+                name="save"
+                scale=".8"
+              /></button>
           </div>
 
-          <div
-            v-if="isSmall === false"
-            class="w-full"
-          >
+          <div class="w-full">
 
-            <div class="text-grey-dark">
-              <p>Color: {{ color.hex }}</p>
+            <div class="w-50 text-right pr-2">
+              <span><small>Created: <time-ago
+                    :refresh="10"
+                    :datetime="clipItem.createdAt"
+                    locale="en"
+                    tooltip
+                  ></time-ago></small></span>
+
+              <span><small> | {{ clipItem.charCount }} Characters</small></span>
 
             </div>
 
-            <sketch-picker
-              v-model="color"
-              v-if="clipSizes[clipItem._id] === false"
-            />
           </div>
 
         </div>
       </div>
+
     </transition-group>
+    <saved-clip-modal
+      :clip-data=showModalClipData
+      v-if="showModal"
+      @close="showModal = false"
+    >
+    </saved-clip-modal>
   </div>
 </template>
 
 <script>
 import { Sketch } from 'vue-color';
+import 'vue2-timeago/dist/vue2-timeago.css';
+import TimeAgo from 'vue2-timeago';
+import SavedClipModal from './SaveClipModal';
+
 const { clipboard } = require("electron"); // eslint-disable-line
 
 export default {
   name: 'main-page',
-  components: { 'sketch-picker': Sketch },
+  components: { 'sketch-picker': Sketch, TimeAgo, SavedClipModal },
   data() {
     return {
       color: 'inherit',
@@ -108,6 +129,8 @@ export default {
       currentClipText: '',
       isSmall: true,
       clipSizes: {},
+      showModalClipData: {},
+      showModal: false,
     };
   },
   created() {
@@ -130,6 +153,7 @@ export default {
             this.$dbStream.insert({
               text: currentClipText,
               html: currentClipHTML,
+              charCount: currentClipText.length,
             });
 
             this.$dbStream
@@ -147,30 +171,12 @@ export default {
     }, 1000);
   },
   methods: {
-    saveClip(clip) {
-      this.$dbSaved.find({ text: clip.text }, (err, docs) => {
-        if (docs.length === 0) {
-          console.log('no match');
-
-          this.$dbSaved.insert({
-            text: clip.text,
-            html: clip.html,
-            stream_id: clip._id,
-            stream_createAt: clip.createdAt,
-          });
-
-          this.$dbSaved
-            .find({})
-            .sort({ createdAt: -1 })
-            .exec((err, docs) => {
-              this.allSavedClip = docs;
-              console.log(`INSERTED new length: ${docs.length}`);
-              console.log(clip.text);
-            });
-        } else {
-          console.log('Entry allready in saved clips!');
-        }
-      });
+    showSavedClipModal(clip) {
+      this.showModal = true;
+      this.showModalClipData = clip;
+    },
+    getTimeAgo(time) {
+      return time;
     },
 
     clearDb() {
@@ -183,6 +189,7 @@ export default {
     expandSection(id) {
       const element = document.getElementById(id);
       console.log(element.id);
+      element.classList.toggle('big');
     },
 
     onCopy() {
@@ -242,41 +249,37 @@ body {
   transition: 0.4s;
 }
 
-.clip-item:hover {
-  cursor: pointer;
-}
-
 .clip-list-move {
   transition: opacity 1s;
 }
 
 .small {
-  height: 55px;
+  height: 65px;
   overflow: scroll;
-  transition: 0.5s;
   overflow-x: hidden;
 }
 
-.clip-wrapper:hover .small {
-  height: 150px;
+.big {
+  height: fit-content !important;
 }
 
-*::-webkit-scrollbar {
-  width: 0.5em;
+::-webkit-scrollbar {
+  width: 0.75em;
+  height: 0.5em;
 }
 
-*::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   -webkit-box-shadow: inset 0 0 6px rgba(124, 47, 47, 0.2);
   border-radius: 10px;
 }
 
-*::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   @apply bg-blue;
   outline: 1px solid white;
   border-radius: 10px;
 }
 
-*::-webkit-scrollbar-corner {
+::-webkit-scrollbar-corner {
   background-color: rgba(0, 0, 0, 0);
 }
 </style>
