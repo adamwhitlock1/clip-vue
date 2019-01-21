@@ -86,6 +86,12 @@
     lodash "^4.2.0"
     to-fast-properties "^2.0.0"
 
+"@johmun/vue-tags-input@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@johmun/vue-tags-input/-/vue-tags-input-2.0.0.tgz#95870006ddd1320eb4979a58cec8ed24ee966c9b"
+  dependencies:
+    vue "^2.5.16"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -7885,6 +7891,12 @@ table@4.0.2:
     lodash "^4.17.4"
     slice-ansi "1.0.0"
     string-width "^2.1.1"
+
+tailwindcss-gradients@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/tailwindcss-gradients/-/tailwindcss-gradients-1.1.0.tgz#686df6067e073145d1a98dbb71cb2b134dd6db46"
+  dependencies:
+    lodash "^4.17.10"
 
 tailwindcss@^0.7.3:
   version "0.7.3"

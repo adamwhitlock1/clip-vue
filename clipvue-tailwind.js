@@ -925,9 +925,24 @@ module.exports = {
   */
 
   plugins: [
+    // eslint-disable-next-line import/no-extraneous-dependencies
     require('tailwindcss/plugins/container')({
       // center: true,
       // padding: '1rem',
+    }),
+    require('tailwindcss-gradients')({
+      variants: ['responsive'],
+      directions: {
+        t: 'to top',
+        r: 'to right',
+        b: 'to bottom',
+        l: 'to left',
+      },
+      gradients: {
+        red: '#f00',
+        'red-blue': ['#f00', '#00f'],
+        'red-green-blue': ['#f00', '#0f0', '#00f'],
+      },
     }),
   ],
 
